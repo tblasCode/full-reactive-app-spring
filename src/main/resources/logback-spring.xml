@@ -1,0 +1,41 @@
+<configuration>
+
+	<include
+		resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+	<springProfile name="kubernetes">
+		<appender name="CONSOLE"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<encoder
+				class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<timestamp>
+						<timeZone>UTC</timeZone>
+					</timestamp>
+					<pattern>
+						<pattern>
+							{
+							"logger": "%logger",
+							"level": "%level",
+							"thread": "%thread",
+							"message": "%message",
+							"exception":"%exception"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</springProfile>
+
+	<springProfile name="!kubernetes">
+		<include
+			resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	</springProfile>
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+	<logger name="com.lab.demo" level="DEBUG" />
+
+</configuration>

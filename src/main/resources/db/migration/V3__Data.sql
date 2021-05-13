@@ -1,0 +1,1 @@
+INSERT INTO POLL (ID, NAME) VALUES (nextval('polls_sequence'), 'kata-Apirest-2');
