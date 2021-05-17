@@ -1,1 +1,1 @@
-INSERT INTO POLL (ID, NAME) VALUES (nextval('polls_sequence'), 'kata-Apirest-2');
+INSERT INTO POLL (ID, REFERENCE, NAME) VALUES (nextval('poll_id_seq'), uuid_generate_v4(), 'kata-Apirest-2');

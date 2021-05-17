@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ms-poll
+  name: ms-poll
+  namespace: tms-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-poll
+  template:
+    metadata:
+      labels:
+        app: ms-poll
+        role: service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      tolerations:
+        - key: "spotInstance"
+          operator: "Equal"
+          value: "true"
+          effect: "PreferNoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: lifecycle
+                    operator: In
+                    values:
+                      - EC2Spot
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: intent
+                    operator: In
+                    values:
+                      - apps
+      containers:
+        - image: harbor.tyc.vass.es/tms-dev/ms-poll-back-app:1.0.0-SNAPSHOT
+          imagePullPolicy: Always
+          name: app
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          env:
+            - name: "JAVA_OPTS"
+              value: >-
+                -XX:+UseParallelGC
+                -Xms128m
+                -Xmx128m
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ms-commons
+                  key: postgres.host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ms-commons
+                  key: postgres.port
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ms-commons
+                  key: postgres.username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ms-commons
+                  key: postgres.password
+            - name: BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  name: ms-commons
+                  key: bootstrap-servers
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: ms-polizas
+                  key: postgres.database
+          envFrom:
+          - secretRef:
+              name: ms-poll
+          - configMapRef:
+              name: ms-poll
+          resources:
+            requests:
+              cpu: 400m
+              memory: 500Mi
+            limits:
+              cpu: 800m
+              memory: 1000Mi

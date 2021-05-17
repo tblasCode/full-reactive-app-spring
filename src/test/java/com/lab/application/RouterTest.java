@@ -24,10 +24,10 @@ public class RouterTest extends AbstractIntegrationTest {
     webTestClient
       // Create a GET request to test an endpoint
       .get().uri("/polls")
-      .accept(MediaType.TEXT_PLAIN)
+      .header("Content-Type", "application/json")
+      .accept(MediaType.APPLICATION_JSON)
       .exchange()
       // and use the dedicated DSL to test assertions against the response
-      .expectStatus().isOk()
-      .expectBody(String.class).isEqualTo("Hello, Labs!");
+      .expectStatus().isOk();
   }
 }

@@ -8,6 +8,17 @@ Demo reactivo con spring.
 mvn clean package
 ```
 
+## Despliegue en el cluster 📦
+
+```
+mvn clean spring-boot:build-image
+docker login ---
+docker push ---
+kubectl apply -f deployment.yml
+kubectl apply -f service.yml
+```
+
+
 ## Ejecución 🔧
 
 ```

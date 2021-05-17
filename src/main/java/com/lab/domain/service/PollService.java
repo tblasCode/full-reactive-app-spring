@@ -1,5 +1,9 @@
 package com.lab.domain.service;
 
-public interface PollService {
+import com.lab.domain.model.Poll;
 
+import reactor.core.publisher.Flux;
+
+public interface PollService {
+  public Flux<Poll> getAll();
 }

@@ -1,0 +1,1 @@
+CREATE TABLE POLLING (POLL_ID integer REFERENCES POLL (ID), rate integer);
